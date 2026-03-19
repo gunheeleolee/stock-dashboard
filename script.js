@@ -82,6 +82,107 @@ const TAB_CONFIG = {
   }
 };
 
+// 대시보드 로딩
+async function loadDashboard() {
+  const dashView = document.getElementById('dashboard-view');
+  dashView.innerHTML = '<div class="dash-loading">불러오는 중...</div>';
+
+  // 3개 시장 데이터 병렬 로딩
+  const [cryptoMarket, usMarket, krMarket, cryptoAnalysis, usAnalysis, krAnalysis, cryptoNews, usNews, krNews] = await Promise.all([
+    fetch('/api/crypto/market').then(r => r.json()).catch(() => ({ market: [], fearGreed: null })),
+    fetch('/api/us/market').then(r => r.json()).catch(() => ({ market: [], fearGreed: null })),
+    fetch('/api/kr/market').then(r => r.json()).catch(() => ({ market: [], fearGreed: null })),
+    fetch('/api/crypto/analysis').then(r => r.json()).catch(() => ({})),
+    fetch('/api/us/analysis').then(r => r.json()).catch(() => ({})),
+    fetch('/api/kr/analysis').then(r => r.json()).catch(() => ({})),
+    fetch('/api/crypto/news').then(r => r.json()).catch(() => []),
+    fetch('/api/us/news').then(r => r.json()).catch(() => []),
+    fetch('/api/kr/news').then(r => r.json()).catch(() => []),
+  ]);
+
+  // 캐시 저장
+  cache.crypto.market = cryptoMarket; cache.crypto.analysis = cryptoAnalysis; cache.crypto.news = cryptoNews;
+  cache.us.market = usMarket; cache.us.analysis = usAnalysis; cache.us.news = usNews;
+  cache.kr.market = krMarket; cache.kr.analysis = krAnalysis; cache.kr.news = krNews;
+
+  if (currentTab !== 'dashboard') return;
+
+  const directionColor = {
+    '강한상승': '#ff3b30', '약한상승': '#ff9500', '중립': '#8e8e93',
+    '약한하락': '#007aff', '강한하락': '#5856d6'
+  };
+
+  const today = new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+
+  function renderMarketCard(label, emoji, tabKey, marketData, analysisData, newsData, config) {
+    const { market, fearGreed } = marketData;
+    const topItems = (market || []).slice(0, 4);
+    const topNews = (newsData || []).slice(0, 3);
+    const fgColor = fearGreed ? config.fearGreedColor(fearGreed.value) : '#999';
+    const fgText = fearGreed ? config.translateFG(fearGreed.classification) : '';
+
+    return `
+      <div class="dash-card">
+        <div class="dash-card-header" onclick="switchTab('${tabKey}')">
+          <span class="dash-card-emoji">${emoji}</span>
+          <span class="dash-card-label">${label}</span>
+          <span class="dash-card-arrow">→</span>
+        </div>
+
+        <div class="dash-market-row">
+          ${topItems.map(item => {
+            const change = item.change?.toFixed(2);
+            const isUp = item.change >= 0;
+            return `<div class="dash-market-item">
+              <span class="dash-sym">${item.symbol}</span>
+              <span class="dash-price">${config.formatPrice(item)}</span>
+              <span class="dash-chg ${isUp ? 'up' : 'down'}">${isUp ? '▲' : '▼'} ${Math.abs(change)}%</span>
+            </div>`;
+          }).join('')}
+        </div>
+
+        <div class="dash-indicators">
+          ${fearGreed ? `
+            <div class="dash-fg">
+              <span class="dash-fg-label">${config.fearGreedLabel}</span>
+              <span class="dash-fg-value" style="color:${fgColor}">${fearGreed.value} ${fgText}</span>
+            </div>
+          ` : ''}
+          ${analysisData.direction ? `
+            <div class="dash-direction">
+              <span class="dash-dir-label">방향성</span>
+              <span class="dash-dir-value" style="color:${directionColor[analysisData.direction] || '#1a1a1a'}">${analysisData.direction}</span>
+            </div>
+          ` : ''}
+        </div>
+
+        ${analysisData.comment ? `<div class="dash-comment">${analysisData.comment}</div>` : ''}
+
+        ${topNews.length > 0 ? `
+          <div class="dash-news">
+            ${topNews.map(n => `
+              <div class="dash-news-item">
+                <span class="dash-news-signal" style="color:${SIGNAL_STYLE[n.signal]?.color || '#999'}">●</span>
+                <span class="dash-news-title">${n.koreanTitle}</span>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  dashView.innerHTML = `
+    <div class="dash-date">📅 ${today}</div>
+    <div class="dash-grid">
+      ${renderMarketCard('Crypto', '🪙', 'crypto', cryptoMarket, cryptoAnalysis, cryptoNews, TAB_CONFIG.crypto)}
+      ${renderMarketCard('US Stock', '🇺🇸', 'us', usMarket, usAnalysis, usNews, TAB_CONFIG.us)}
+      ${renderMarketCard('KR Stock', '🇰🇷', 'kr', krMarket, krAnalysis, krNews, TAB_CONFIG.kr)}
+    </div>
+    <div class="disclaimer">※ 본 서비스는 투자 참고용 정보만 제공하며, 투자 추천이나 자문이 아닙니다.</div>
+  `;
+}
+
 // 탭 전환
 function switchTab(tab) {
   currentTab = tab;
@@ -91,6 +192,25 @@ function switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.tab === tab);
   });
+
+  const dashView = document.getElementById('dashboard-view');
+  const tabContent = document.getElementById('tab-content');
+  const sidebar = document.getElementById('sidebar');
+  const mobileBtn = document.getElementById('mobile-menu-btn');
+
+  if (tab === 'dashboard') {
+    dashView.style.display = '';
+    tabContent.style.display = 'none';
+    sidebar.style.display = 'none';
+    mobileBtn.style.display = 'none';
+    loadDashboard();
+    return;
+  }
+
+  dashView.style.display = 'none';
+  tabContent.style.display = '';
+  sidebar.style.display = '';
+  mobileBtn.style.display = '';
 
   const config = TAB_CONFIG[tab];
 
@@ -445,6 +565,13 @@ function toggleAccordion(titleEl) {
   body.classList.toggle('collapsed');
 }
 
+function toggleInsider() {
+  const list = document.getElementById('insider-list');
+  const arrow = document.getElementById('insider-arrow');
+  list.classList.toggle('collapsed');
+  arrow.classList.toggle('open');
+}
+
 // 모바일 메뉴
 document.getElementById('mobile-menu-btn').addEventListener('click', () => {
   document.getElementById('sidebar').classList.add('open');
@@ -462,4 +589,4 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 });
 
 // 초기 로딩
-switchTab('crypto');
+switchTab('dashboard');

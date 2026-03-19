@@ -16,11 +16,20 @@
         <p>AI 뉴스 큐레이션</p>
         <!-- 탭 네비게이션 -->
         <nav class="tab-nav" id="tab-nav">
-          <button class="tab-btn active" data-tab="crypto">Crypto</button>
+          <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+          <button class="tab-btn" data-tab="crypto">Crypto</button>
           <button class="tab-btn" data-tab="us">US Stock</button>
           <button class="tab-btn" data-tab="kr">KR Stock</button>
         </nav>
       </header>
+
+      <!-- 대시보드 (3개 시장 요약) -->
+      <div id="dashboard-view" class="dashboard-view">
+        <div class="dash-loading">불러오는 중...</div>
+      </div>
+
+      <!-- 개별 탭 콘텐츠 -->
+      <div id="tab-content" style="display:none;">
 
       <!-- 브리핑 -->
       <div class="daily-brief" id="brief-section">
@@ -42,8 +51,11 @@
 
       <!-- 특수 섹션: 내부자 거래 / DART 공시 (US, KR만) -->
       <div class="insider-section" id="insider-section" style="display:none;">
-        <div class="insider-title" id="insider-title"></div>
-        <div id="insider-list" class="insider-list">불러오는 중...</div>
+        <div class="insider-toggle" onclick="toggleInsider()">
+          <div class="insider-title" id="insider-title"></div>
+          <span class="insider-toggle-arrow" id="insider-arrow">▼</span>
+        </div>
+        <div id="insider-list" class="insider-list collapsed">불러오는 중...</div>
       </div>
 
       <!-- 기사 목록 -->
@@ -54,6 +66,8 @@
       <div class="disclaimer">
         ※ 본 서비스는 투자 참고용 정보만 제공하며, 투자 추천이나 자문이 아닙니다.
       </div>
+
+      </div><!-- /tab-content -->
     </main>
 
     <!-- 사이드바 -->
