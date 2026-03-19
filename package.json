@@ -1,0 +1,17 @@
+{
+  "name": "stock-dashboard",
+  "version": "1.0.0",
+  "description": "Unified dashboard for Crypto, US Stock, and KR Stock news",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.79.0",
+    "@supabase/supabase-js": "^2.99.2",
+    "axios": "^1.13.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "rss-parser": "^3.13.0"
+  }
+}

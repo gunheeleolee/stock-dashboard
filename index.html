@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="layout">
+
+    <!-- 메인 콘텐츠 -->
+    <main class="main-content">
+      <header>
+        <h1 id="page-title">Stock Dashboard</h1>
+        <p id="page-subtitle">AI 뉴스 큐레이션</p>
+        <!-- 탭 네비게이션 -->
+        <nav class="tab-nav" id="tab-nav">
+          <button class="tab-btn active" data-tab="crypto">Crypto</button>
+          <button class="tab-btn" data-tab="us">US Stock</button>
+          <button class="tab-btn" data-tab="kr">KR Stock</button>
+        </nav>
+      </header>
+
+      <!-- 브리핑 -->
+      <div class="daily-brief" id="brief-section">
+        <div class="brief-date" id="brief-date"></div>
+        <div class="brief-text" id="brief-text">브리핑 불러오는 중...</div>
+        <div class="brief-picks">
+          <div class="picks-label">📌 오늘 꼭 읽어야 할 기사</div>
+          <div id="picks-list"></div>
+        </div>
+      </div>
+
+      <!-- 시장 분석 -->
+      <div class="market-analysis-section">
+        <div class="analysis-title">📊 단기 시장 방향성</div>
+        <div id="market-analysis">
+          <div class="analysis-comment">분석 불러오는 중...</div>
+        </div>
+      </div>
+
+      <!-- 특수 섹션: 내부자 거래 / DART 공시 (US, KR만) -->
+      <div class="insider-section" id="insider-section" style="display:none;">
+        <div class="insider-title" id="insider-title"></div>
+        <div id="insider-list" class="insider-list">불러오는 중...</div>
+      </div>
+
+      <!-- 기사 목록 -->
+      <div class="news-list" id="news-list">
+        <div class="empty">기사 불러오는 중...</div>
+      </div>
+
+      <div class="disclaimer">
+        ※ 본 서비스는 투자 참고용 정보만 제공하며, 투자 추천이나 자문이 아닙니다.
+      </div>
+    </main>
+
+    <!-- 사이드바 -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        <div class="sidebar-section">
+          <div class="sidebar-title">시세</div>
+          <div class="market-bar" id="market-bar">불러오는 중...</div>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-title">필터</div>
+          <div id="filters"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 모바일 메뉴 버튼 -->
+    <button class="mobile-menu-btn" id="mobile-menu-btn">☰ 시세 · 필터</button>
+    <div class="overlay" id="overlay"></div>
+
+  </div>
+
+  <script src="/script.js"></script>
+</body>
+</html>
