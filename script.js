@@ -92,10 +92,7 @@ function switchTab(tab) {
     btn.classList.toggle('active', btn.dataset.tab === tab);
   });
 
-  // 헤더 업데이트
   const config = TAB_CONFIG[tab];
-  document.getElementById('page-title').textContent = config.title;
-  document.getElementById('page-subtitle').textContent = config.subtitle;
 
   // 콘텐츠 초기화
   document.getElementById('brief-text').textContent = '브리핑 불러오는 중...';
