@@ -543,9 +543,14 @@ header p {
 }
 
 .insider-toggle-arrow {
-  font-size: 12px;
-  color: #999;
-  transition: transform 0.2s;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ccc;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.insider-toggle:hover .insider-toggle-arrow {
+  color: #1a1a1a;
 }
 
 .insider-toggle-arrow.open {
